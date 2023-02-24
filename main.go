@@ -1,14 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/M-Faheem-Khan/goTemplateEngine-Test/engine"
+	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
-	htmlFile, err := os.ReadFile("/workspaces/goTemplateEngine-Test/templates/index.html")
+	templatePath := "/workspaces/goTemplateEngine-Test/templates/index.html"
+	htmlFile, err := os.ReadFile(templatePath)
 	if err != nil {
 		panic(err)
 	}
@@ -16,10 +17,19 @@ func main() {
 	vars := map[string]string{
 		"title":           "POC - Template Engine written in Go",
 		"sample_variable": "Hello World - I'm rendered via Golang template engine",
+		"boolean":         "true",
 	}
 
 	s := engine.Parse(htmlFile, vars)
-	fmt.Println(s)
+
+	app := fiber.New()
+
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.Send([]byte(s))
+	})
+
+	app.Listen(":3000")
+
 }
 
 // EOF
